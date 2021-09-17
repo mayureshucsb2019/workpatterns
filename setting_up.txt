@@ -1,0 +1,17 @@
+npm init
+
+# Install Dependencies
+npm install express
+npm install body-parser
+npm install dotenv
+npm install http
+npm install mongoose
+npm install mongodb
+
+npm install fs
+npm install crypto
+
+# Add code to package.json in "scripts"
+"start": "node index.js"
+
+# Populate the values in the .env file
