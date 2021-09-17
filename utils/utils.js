@@ -24,7 +24,7 @@ const storeJsonToDb = function () {
     });
 }
 
-const buildKeyValueStore = async function (emailOfUser) {
+const buildKeyValueStore = async function () {
     let fileContent = JSON.parse(fs.readFileSync("./emails_aug_4.json"));
     let receivers = [];
     let sender = "";
@@ -78,7 +78,9 @@ const buildKeyValueStore = async function (emailOfUser) {
     console.log(senders_map, "\n", Object.keys(senders_map),Object.keys(senders_map).length)
 }
 
-buildKeyValueStore()
+const buildOrgResponseTimeMap = async function(){
+    
+}
 
 const storeKeyValueToDb = function () {
     // insert the values into the database
