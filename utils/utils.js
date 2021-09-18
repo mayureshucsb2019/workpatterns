@@ -142,7 +142,7 @@ const convertToYearMonthDay = function (time) {
     return [month, days, hours, minutes, remaining]
 }
 
-convertToYearMonthDay((60 * 60 * 24 * 30) * 1 + (60 * 60 * 24) * 2 + (60 * 60) * 3 + 60 * 4 + 5);
+// convertToYearMonthDay((60 * 60 * 24 * 30) * 1 + (60 * 60 * 24) * 2 + (60 * 60) * 3 + 60 * 4 + 5);
 
 const getYearMonthResponseTimes = function (times) {
     times = sortByAbsoluteValue(times);
