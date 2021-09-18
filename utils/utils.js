@@ -125,25 +125,6 @@ const sortByAbsoluteValue = function (numbers) {
     return numbers
 }
 
-// takes parameter in seconds
-const convertToYearMonthDay = function (time) {
-    let remaining = time;
-    let month = Math.floor(time / (60 * 60 * 24 * 30));
-    // this is the remaining days
-    remaining %= 60 * 60 * 24 * 30;
-    let days = Math.floor(remaining / (60 * 60 * 24));
-    // this is remaining hours
-    remaining %= 60 * 60 * 24;
-    let hours = Math.floor(remaining / (60 * 60));
-    remaining %= 60 * 60;
-    let minutes = Math.floor(remaining / 60);
-    remaining %= 60;
-    console.log([month, days, hours, minutes, remaining])
-    return [month, days, hours, minutes, remaining]
-}
-
-// convertToYearMonthDay((60 * 60 * 24 * 30) * 1 + (60 * 60 * 24) * 2 + (60 * 60) * 3 + 60 * 4 + 5);
-
 const getYearMonthResponseTimes = function (times) {
     times = sortByAbsoluteValue(times);
     // console.log(times);

@@ -1,13 +1,16 @@
+# Initialize with npm
 npm init
 
-# Install Dependencies
+# Install Necessary Dependencies 
 npm install express
 npm install body-parser
 npm install dotenv
 npm install http
 npm install mongoose
 npm install mongodb
+npm install cors
 
+# Install Optional Dependencies
 npm install fs
 npm install crypto
 

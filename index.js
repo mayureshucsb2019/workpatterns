@@ -9,12 +9,13 @@ const mongoose = require("mongoose");
 const routes = require("./routes/routes");
 const dotenv = require('dotenv').config();
 const errorController = require("./controllers/errorController");
+const cors = require('cors');
 const { port, mongoURI } = require("./utils/constants");
 const { storeJsonToDb, storeKeyValueToDb } = require("./utils/utils");
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
-// app.use(cors());
+app.use(cors());
 app.use(routes);
 app.use(errorController.get404);
 
