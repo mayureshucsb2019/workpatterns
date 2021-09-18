@@ -1,8 +1,8 @@
-const utils = require("../utils/utils");
-const constants = require("../utils/constants");
+const { fetchEmailReplyTimes } = require("../utils/utils");
 
-const exampleFunction = async function (req, res) {
-    
+const getEmailReplyTimeForUser = async function (req, res) {
+    console.log("Request received in getEmailReplyTimeForUser");
+    res.status(200).send({ status: 200, message: fetchEmailReplyTimes() });
 }
 
-exports.exampleFunction = exampleFunction;
+exports.getEmailReplyTimeForUser = getEmailReplyTimeForUser;

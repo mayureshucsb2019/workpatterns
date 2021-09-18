@@ -1,8 +1,7 @@
-const { md5Secret } = require("../utils/constants");
+const { monthMapNum } = require("../utils/constants");
 const MessageSchema = require("../models/messageSchema");
 const EmailResponseTimeSchema = require("../models/emailResponseTimeSchema");
 const fs = require("fs");
-const crypto = require("crypto");
 
 const domainTimeStampMap = {};
 
@@ -10,17 +9,10 @@ const sleep = function (msec) {
     return new Promise(resolve => setTimeout(resolve, msec * 1000));
 }
 
-const sortByAbsoluteValue = function (numbers) {
-    numbers.sort(function (a, b) {
-        return Math.abs(a) - Math.abs(b);
-    })
-    return numbers
-}
-
 const storeJsonToDb = function () {
     fileContent = JSON.parse(fs.readFileSync("./emails_aug_4.json"));
-    console.log(fileContent[0]);
-    console.log(fileContent.length);
+    // console.log(fileContent[0]);
+    // console.log(fileContent.length);
     MessageSchema.insertMany(fileContent, function (err, docs) {
         if (err) {
             return console.error(err);
@@ -103,7 +95,7 @@ const buildKeyValueStore = async function (userEmail) {
             }
         }
     }
-    console.log(Object.keys(domainTimeStampMap).length);
+    // console.log(Object.keys(domainTimeStampMap).length);
     const domainTimeStampMapObj = [];
     // write the parsed data to the file to be processed by schema for multiple entry input
     for (let [key, value] of Object.entries(domainTimeStampMap)) {
@@ -112,8 +104,6 @@ const buildKeyValueStore = async function (userEmail) {
     fs.writeFileSync("./emailTimeStampArrayObj.json", JSON.stringify(domainTimeStampMapObj));
     // console.log(senders_map, "\n", Object.keys(senders_map), Object.keys(senders_map).length)
 }
-
-// buildKeyValueStore("noah@workpatterns.ai")
 
 const storeKeyValueToDb = function () {
     // insert the values into the database
@@ -127,13 +117,100 @@ const storeKeyValueToDb = function () {
     });
 }
 
-const fetchEmailReplyTimes = function (emailId) {
-    const fileContent = JSON.parse(fs.readFileSync("./emailTimeStampArrayObj.json"));
-    console.log(fileContent);
+const sortByAbsoluteValue = function (numbers) {
+    numbers.sort(function (a, b) {
+        return Math.abs(a) - Math.abs(b);
+    })
+    // console.log(numbers)
+    return numbers
 }
 
-fetchEmailReplyTimes();
+// takes parameter in seconds
+const convertToYearMonthDay = function (time) {
+    let remaining = time;
+    let month = Math.floor(time / (60 * 60 * 24 * 30));
+    // this is the remaining days
+    remaining %= 60 * 60 * 24 * 30;
+    let days = Math.floor(remaining / (60 * 60 * 24));
+    // this is remaining hours
+    remaining %= 60 * 60 * 24;
+    let hours = Math.floor(remaining / (60 * 60));
+    remaining %= 60 * 60;
+    let minutes = Math.floor(remaining / 60);
+    remaining %= 60;
+    console.log([month, days, hours, minutes, remaining])
+    return [month, days, hours, minutes, remaining]
+}
 
+convertToYearMonthDay((60 * 60 * 24 * 30) * 1 + (60 * 60 * 24) * 2 + (60 * 60) * 3 + 60 * 4 + 5);
+
+const getYearMonthResponseTimes = function (times) {
+    times = sortByAbsoluteValue(times);
+    // console.log(times);
+    // assume that times is sorted by absolute value
+    const l = times.length
+    const responseTime = {}
+    let waitingSince = times[0] // first mail is the time when it starts waiting
+    let date = "";
+    let year = "";
+    let month = "";
+    for (let i = 1; i < l; i++) {
+        if (waitingSince == 0) {// means start of new communication
+            waitingSince = times[i];
+        }
+        // if the sign of the timestamp changes then we have new response
+        if (Math.sign(times[i]) * Math.sign(waitingSince) == -1) {
+            date = new Date(Math.abs(waitingSince * 1000));
+            year = date.getFullYear();
+            month = date.getMonth() + 1;
+            keyString = `${year}` + `${monthMapNum[month]}`;
+            // console.log("Date: ", date);
+            // console.log(`Response recevied for ${waitingSince} at ${times[i]}`);
+            // console.log("Keystting: ", keyString)
+            // responseTime.push([waitingSince, Math.abs(waitingSince + times[i])]);
+            if (responseTime.hasOwnProperty(keyString)) {
+                responseTime[keyString] += Math.abs(waitingSince + times[i]);
+            } else {
+                responseTime[keyString] = Math.abs(waitingSince + times[i]);
+            }
+            // console.log(responseTime)
+            waitingSince = 0; //end of response cycle
+        }
+    }
+    // if waiting still but no reponse till current date
+    if (waitingSince != 0) {
+        // take difference with the current time
+        let currentDate = Math.floor(new Date().getTime() / 1000);
+        date = new Date(Math.abs(waitingSince * 1000));
+        year = date.getFullYear();
+        month = date.getMonth() + 1;
+        keyString = `${year}` + `${monthMapNum[month]}`;
+        // console.log(`Response recevied for ${waitingSince} at ${currentDate} current`);
+        // console.log("Keystting: ", keyString)
+        // responseTime.push([waitingSince, currentDate - Math.abs(waitingSince)]);
+        if (responseTime.hasOwnProperty(keyString)) {
+            responseTime[keyString] += currentDate - Math.abs(waitingSince);
+        } else {
+            responseTime[keyString] = currentDate - Math.abs(waitingSince);
+        }
+    }
+    // console.log(responseTime);
+    return responseTime;
+}
+
+const fetchEmailReplyTimes = function (emailId) {
+    const fileContent = JSON.parse(fs.readFileSync("./emailTimeStampArrayObj.json"));
+    const orgResponseTimeMap = {};
+    fileContent.forEach(element => {
+        orgResponseTimeMap[element.key] = getYearMonthResponseTimes(element.times);
+    });
+    // console.log(orgResponseTimeMap)
+    // fs.writeFileSync("./respTimeByOrg.json", JSON.stringify(orgResponseTimeMap));
+    return orgResponseTimeMap
+}
+
+exports.fetchEmailReplyTimes = fetchEmailReplyTimes;
+exports.getYearMonthResponseTimes = getYearMonthResponseTimes;
 exports.storeKeyValueToDb = storeKeyValueToDb;
 exports.buildKeyValueStore = buildKeyValueStore;
 exports.storeJsonToDb = storeJsonToDb;
