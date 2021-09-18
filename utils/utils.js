@@ -135,6 +135,7 @@ const getYearMonthResponseTimes = function (times) {
     let date = "";
     let year = "";
     let month = "";
+    let monthCount = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0 };
     for (let i = 1; i < l; i++) {
         if (waitingSince == 0) {// means start of new communication
             waitingSince = times[i];
@@ -144,13 +145,16 @@ const getYearMonthResponseTimes = function (times) {
             date = new Date(Math.abs(waitingSince * 1000));
             year = date.getFullYear();
             month = date.getMonth() + 1;
+            // this denotes one response for the month that it was waiting since
+            monthCount[month] += 1
             keyString = `${year}` + `${monthMapNum[month]}`;
             // console.log("Date: ", date);
             // console.log(`Response recevied for ${waitingSince} at ${times[i]}`);
             // console.log("Keystting: ", keyString)
             // responseTime.push([waitingSince, Math.abs(waitingSince + times[i])]);
             if (responseTime.hasOwnProperty(keyString)) {
-                responseTime[keyString] += Math.abs(waitingSince + times[i]);
+                // averageout response time and floor to remove the fraction
+                responseTime[keyString] = Math.floor((responseTime[keyString] + Math.abs(waitingSince + times[i])) / monthCount[month]);
             } else {
                 responseTime[keyString] = Math.abs(waitingSince + times[i]);
             }
@@ -182,8 +186,8 @@ const getYearMonthResponseTimes = function (times) {
 const fetchEmailReplyTimes = function (emailId) {
     const fileContent = JSON.parse(fs.readFileSync("./emailTimeStampArrayObj.json"));
     const orgResponseTimeMap = {};
-    fileContent.forEach(element => {
-        orgResponseTimeMap[element.key] = getYearMonthResponseTimes(element.times);
+    fileContent.forEach(organisation => {
+        orgResponseTimeMap[organisation.key] = getYearMonthResponseTimes(organisation.times);
     });
     // console.log(orgResponseTimeMap)
     // fs.writeFileSync("./respTimeByOrg.json", JSON.stringify(orgResponseTimeMap));
