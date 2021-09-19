@@ -174,9 +174,10 @@ const getYearMonthResponseTimes = function (times) {
         // console.log("Keystting: ", keyString)
         // responseTime.push([waitingSince, currentDate - Math.abs(waitingSince)]);
         if (responseTime.hasOwnProperty(keyString)) {
-            responseTime[keyString] += currentDate - Math.abs(waitingSince);
+            responseTime[keyString] += 0 //currentDate - Math.abs(waitingSince);
         } else {
-            responseTime[keyString] = currentDate - Math.abs(waitingSince);
+            // responseTime[keyString] = currentDate - Math.abs(waitingSince);
+            responseTime[keyString] = 0;
         }
     }
     // console.log(responseTime);
