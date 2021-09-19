@@ -135,7 +135,7 @@ const getYearMonthResponseTimes = function (times) {
     let date = "";
     let year = "";
     let month = "";
-    let monthCount = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0 };
+    let monthCount = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0 };
     for (let i = 1; i < l; i++) {
         if (waitingSince == 0) {// means start of new communication
             waitingSince = times[i];

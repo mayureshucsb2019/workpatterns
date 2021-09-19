@@ -11,7 +11,7 @@ const dotenv = require('dotenv').config();
 const errorController = require("./controllers/errorController");
 const cors = require('cors');
 const { port, mongoURI } = require("./utils/constants");
-const { storeJsonToDb, storeKeyValueToDb } = require("./utils/utils");
+// const { storeJsonToDb, storeKeyValueToDb } = require("./utils/utils");
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
